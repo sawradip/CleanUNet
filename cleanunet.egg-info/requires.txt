@@ -1,0 +1,7 @@
+pillow
+torchaudio
+inflect
+scipy
+tqdm
+pesq
+pystoi

@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from stft_loss import MultiResolutionSTFTLoss
+from .stft_loss import MultiResolutionSTFTLoss
 
 
 def flatten(v):
