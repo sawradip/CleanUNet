@@ -19,20 +19,32 @@ pip install cleanunet
 `cleanunet` can be used to denoise audio files easily. Here's a basic example:
 
 ```python
+import time
+
+import torch
 import torchaudio
 from cleanunet import CleanUNet
 
-# Load an audio file
-aud, sr = torchaudio.load("path_to_your_audio_file.wav")
+input_filename = "path_to_your_audio_file.wav"
+output_filename = "path_to_the_denoised_audio_file.wav"
+model_variant = "full"  # or "high"
 
-# Initialize CleanUNet
-net = CleanUNet.from_pretrained(variant='full') # or 'high'
+print(f"Loading {input_filename}...")
+aud, sr = torchaudio.load(input_filename)
 
-# Perform denoising
-denoised_aud = net(aud)[0]
+print(f"Loading model variant {model_variant}...")
+net = CleanUNet.from_pretrained(model_variant)
 
-# Save the denoised audio
-torchaudio.save('path_to_denoised_audio_file.wav', denoised_aud, sr)
+print("Denoising...")
+start = time.time()
+with torch.no_grad():
+    denoised_aud = net(aud)[0]
+end = time.time()
+duration = aud.shape[1] / sr
+print(f"Inference took {end - start:.3f}s (audio duration: {duration:.3f}s, {duration / (end - start):.1f}x)")
+
+print(f"Saving result to {output_filename}...")
+torchaudio.save(output_filename, denoised_aud, sr)
 ```
 
 To utilize CUDA for faster processing:
@@ -40,7 +52,8 @@ To utilize CUDA for faster processing:
 ```python
 aud, sr = torchaudio.load("path_to_your_audio_file.wav")
 net = CleanUNet.from_pretrained(variant='full', device='cuda')
-denoised_aud = net(aud.to('cuda'))[0]
+with torch.no_grad():
+    denoised_aud = net(aud.to('cuda'))[0]
 ```
 
 ## Credits and References
